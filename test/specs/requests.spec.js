@@ -53,7 +53,7 @@ describe('requests', function () {
   });
 
   it('should reject on network errors', function (done) {
-    // disable jasmine.Ajax since we're hitting a non-existant server anyway
+    // disable jasmine.Ajax since we're hitting a non-existent server anyway
     jasmine.Ajax.uninstall();
 
     var resolveSpy = jasmine.createSpy('resolve');
@@ -173,6 +173,48 @@ describe('requests', function () {
       request.respondWith({
         status: 0,
         responseURL: 'file:///xxx',
+      });
+    });
+  });
+
+  it('should resolve when validateStatus is null', function (done) {
+    var resolveSpy = jasmine.createSpy('resolve');
+    var rejectSpy = jasmine.createSpy('reject');
+
+    axios('/foo', {
+      validateStatus: null
+    }).then(resolveSpy)
+      .catch(rejectSpy)
+      .then(function () {
+        expect(resolveSpy).toHaveBeenCalled();
+        expect(rejectSpy).not.toHaveBeenCalled();
+        done();
+      });
+
+    getAjaxRequest().then(function (request) {
+      request.respondWith({
+        status: 500
+      });
+    });
+  });
+
+  it('should resolve when validateStatus is undefined', function (done) {
+    var resolveSpy = jasmine.createSpy('resolve');
+    var rejectSpy = jasmine.createSpy('reject');
+
+    axios('/foo', {
+      validateStatus: undefined
+    }).then(resolveSpy)
+      .catch(rejectSpy)
+      .then(function () {
+        expect(resolveSpy).toHaveBeenCalled();
+        expect(rejectSpy).not.toHaveBeenCalled();
+        done();
+      });
+
+    getAjaxRequest().then(function (request) {
+      request.respondWith({
+        status: 500
       });
     });
   });
